@@ -15,6 +15,58 @@ export function createEmptyState(): AppState {
   return { schemaVersion: 1, tasks: [] };
 }
 
+export class ImportError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ImportError";
+  }
+}
+
+function isValidTask(value: unknown): value is Task {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const task = value as Task;
+  return (
+    typeof task.id === "string" &&
+    typeof task.title === "string" &&
+    (task.dueDate === null || typeof task.dueDate === "string") &&
+    Array.isArray(task.tags) &&
+    task.tags.every((tag) => typeof tag === "string") &&
+    typeof task.completed === "boolean" &&
+    (task.completedAt === null || typeof task.completedAt === "string") &&
+    typeof task.createdAt === "string" &&
+    typeof task.updatedAt === "string"
+  );
+}
+
+export function parseImportSnapshot(json: string): AppState {
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new ImportError("JSON không hợp lệ");
+  }
+
+  if (
+    typeof parsed !== "object" ||
+    parsed === null ||
+    (parsed as AppState).schemaVersion !== 1 ||
+    !Array.isArray((parsed as AppState).tasks)
+  ) {
+    throw new ImportError("Định dạng backup không hợp lệ");
+  }
+
+  const state = parsed as AppState;
+  if (!state.tasks.every(isValidTask)) {
+    throw new ImportError("Dữ liệu việc trong backup không hợp lệ");
+  }
+
+  return state;
+}
+
 function parseState(raw: string | null): AppState {
   if (!raw) {
     return createEmptyState();
@@ -172,5 +224,15 @@ export class TaskStore {
         tasks: [...state.tasks, task],
       };
     });
+  }
+
+  exportSnapshot(): string {
+    return JSON.stringify(this.state);
+  }
+
+  importSnapshot(json: string): void {
+    const nextState = parseImportSnapshot(json);
+    this.state = nextState;
+    this.persist();
   }
 }

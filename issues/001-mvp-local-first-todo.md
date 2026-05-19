@@ -10,7 +10,7 @@ created: 2026-05-19
 
 ## Status
 
-Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Slice **#006 Sửa tiêu đề inline + xóa việc với Undo** hoàn thành (2026-05-19): inline edit tiêu đề, xóa qua hover/overflow menu, toast Hoàn tác 5 giây, `UndoBuffer` in-memory. Slice **#007 View Đã xong: xóa một / xóa hết** hoàn thành (2026-05-19): tab Đã xong, sort `completedAt` mới nhất trước, xóa vĩnh viễn không Undo, xóa hết + dialog xác nhận. Các slice #008–#009 chưa implement.
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Slice **#006 Sửa tiêu đề inline + xóa việc với Undo** hoàn thành (2026-05-19): inline edit tiêu đề, xóa qua hover/overflow menu, toast Hoàn tác 5 giây, `UndoBuffer` in-memory. Slice **#007 View Đã xong: xóa một / xóa hết** hoàn thành (2026-05-19): tab Đã xong, sort `completedAt` mới nhất trước, xóa vĩnh viễn không Undo, xóa hết + dialog xác nhận. Slice **#008 Export / Import JSON trong Settings** hoàn thành (2026-05-19): panel Cài đặt, export snapshot JSON, import với dialog xác nhận + validate. Slice **#009** chưa implement.
 
 ## Acceptance criteria (MVP — tiến độ)
 
@@ -52,11 +52,15 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 10 | Xóa vĩnh viễn một việc đã xong | ✅ #007 |
 | 11 | Xóa hết việc đã xong | ✅ #007 |
 | 12 | Dialog xác nhận trước khi xóa hết | ✅ #007 |
-| 33–35, 38–39, 49 | Còn lại | ⏳ #008–#009 |
+| 33 | Export all data to JSON file | ✅ #008 |
+| 34 | Import JSON backup | ✅ #008 |
+| 35 | Import confirm: overwrite warning + task count | ✅ #008 |
+| 49 | Import/export in Settings (gear icon) | ✅ #008 |
+| 38–39 | Còn lại | ⏳ #009 |
 
 ## Implementation notes
 
-Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes), [#006](./006-sua-tieu-de-xoa-undo.md#implementation-notes), [#007](./007-view-da-xong-xoa.md#implementation-notes).
+Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes), [#006](./006-sua-tieu-de-xoa-undo.md#implementation-notes), [#007](./007-view-da-xong-xoa.md#implementation-notes), [#008](./008-export-import-json-settings.md#implementation-notes).
 
 ### Files created (#002)
 
@@ -180,6 +184,22 @@ Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
 | `src/App.tsx` | View done, xóa vĩnh viễn (không Undo), nút xóa hết + `ConfirmDialog` |
 | `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
 | `issues/007-view-da-xong-xoa.md` | Done + implementation notes |
+
+### Files created (#008)
+
+| File | Mô tả |
+|------|--------|
+| `src/components/SettingsPanel.tsx` | Panel Cài đặt: nút xuất/nhập JSON, chọn file, hiển thị lỗi import |
+
+### Files modified (#008)
+
+| File | Mô tả |
+|------|--------|
+| `src/store/TaskStore.ts` | `exportSnapshot`, `importSnapshot`, `parseImportSnapshot`, `ImportError`, validate task shape |
+| `src/store/TaskStore.test.ts` | Test export, round-trip import, reject invalid JSON |
+| `src/App.tsx` | Icon bánh răng header, wire export download + import confirm dialog |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/008-export-import-json-settings.md` | Done + implementation notes |
 
 ### Files deleted
 

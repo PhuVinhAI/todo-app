@@ -127,4 +127,57 @@ describe("TaskStore", () => {
     const reloaded = new TaskStore(storage);
     expect(reloaded.getState().tasks[0].title).toBe("Việc khôi phục");
   });
+
+  it("exportSnapshot returns JSON of current app state", () => {
+    store.addTask("Việc A");
+    store.addTask("Việc B", "2026-05-20");
+
+    const json = store.exportSnapshot();
+    const parsed = JSON.parse(json);
+
+    expect(parsed.schemaVersion).toBe(1);
+    expect(parsed.tasks).toHaveLength(2);
+    expect(parsed.tasks[0].title).toBe("Việc A");
+    expect(parsed.tasks[1].dueDate).toBe("2026-05-20");
+  });
+
+  it("importSnapshot replaces state and round-trips through export", () => {
+    store.addTask("Việc cũ");
+
+    const otherStorage = createMemoryStorage();
+    const otherStore = new TaskStore(otherStorage);
+    otherStore.addTask("Việc nhập", "2026-05-21", ["work"]);
+    otherStore.toggleTaskComplete(otherStore.getState().tasks[0].id);
+
+    const snapshot = otherStore.exportSnapshot();
+    store.importSnapshot(snapshot);
+
+    expect(store.getState().tasks).toHaveLength(1);
+    expect(store.getState().tasks[0].title).toBe("Việc nhập");
+    expect(store.getState().tasks[0].dueDate).toBe("2026-05-21");
+    expect(store.getState().tasks[0].tags).toEqual(["work"]);
+    expect(store.getState().tasks[0].completed).toBe(true);
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks[0].title).toBe("Việc nhập");
+
+    expect(JSON.parse(store.exportSnapshot())).toEqual(JSON.parse(snapshot));
+  });
+
+  it("importSnapshot rejects invalid JSON without changing state", () => {
+    store.addTask("Việc giữ lại");
+
+    expect(() => store.importSnapshot("not json")).toThrow();
+    expect(store.getState().tasks).toHaveLength(1);
+    expect(store.getState().tasks[0].title).toBe("Việc giữ lại");
+
+    expect(() => store.importSnapshot('{"schemaVersion":2,"tasks":[]}')).toThrow();
+    expect(store.getState().tasks[0].title).toBe("Việc giữ lại");
+
+    expect(() => store.importSnapshot('{"schemaVersion":1}')).toThrow();
+    expect(store.getState().tasks[0].title).toBe("Việc giữ lại");
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks[0].title).toBe("Việc giữ lại");
+  });
 });
