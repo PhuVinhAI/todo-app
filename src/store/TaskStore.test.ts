@@ -43,6 +43,17 @@ describe("TaskStore", () => {
     expect(reloaded.getState().tasks[0].title).toBe("Việc mới");
   });
 
+  it("persists due date on add and update", () => {
+    const task = store.addTask("Việc có hạn", "2026-05-20");
+
+    expect(task.dueDate).toBe("2026-05-20");
+
+    store.updateTaskDue(task.id, null);
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks[0].dueDate).toBeNull();
+  });
+
   it("round-trips toggle complete through storage", () => {
     const task = store.addTask("Việc A");
     store.toggleTaskComplete(task.id);

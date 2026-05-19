@@ -1,4 +1,4 @@
-import { createTask, toggleComplete } from "../domain/TaskDomain";
+import { createTask, setDueDate, toggleComplete } from "../domain/TaskDomain";
 import type { AppState, Task } from "../types";
 
 const STORAGE_KEY = "todo-app-state";
@@ -45,13 +45,30 @@ export class TaskStore {
     this.persist();
   }
 
-  addTask(title: string, now: string = new Date().toISOString()): Task {
-    const task = createTask(title, now);
+  addTask(
+    title: string,
+    dueDate: string | null = null,
+    now: string = new Date().toISOString(),
+  ): Task {
+    const task = createTask(title, now, crypto.randomUUID(), dueDate);
     this.mutate((state) => ({
       ...state,
       tasks: [...state.tasks, task],
     }));
     return task;
+  }
+
+  updateTaskDue(
+    id: string,
+    dueDate: string | null,
+    now: string = new Date().toISOString(),
+  ): void {
+    this.mutate((state) => ({
+      ...state,
+      tasks: state.tasks.map((task) =>
+        task.id === id ? setDueDate(task, dueDate, now) : task,
+      ),
+    }));
   }
 
   toggleTaskComplete(id: string, now: string = new Date().toISOString()): void {

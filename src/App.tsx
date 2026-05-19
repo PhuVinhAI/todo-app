@@ -45,13 +45,18 @@ export default function App() {
   const tasks = filterTasksForView(store.getState().tasks, activeView, today, titleQuery);
   const showQuickAdd = activeView === "today" || activeView === "all";
 
-  const handleAdd = (title: string) => {
-    store.addTask(title);
+  const handleAdd = (title: string, dueDate: string | null = null) => {
+    store.addTask(title, dueDate);
     rerender();
   };
 
   const handleToggleComplete = (id: string) => {
     store.toggleTaskComplete(id);
+    rerender();
+  };
+
+  const handleDueDateChange = (id: string, dueDate: string | null) => {
+    store.updateTaskDue(id, dueDate);
     rerender();
   };
 
@@ -64,11 +69,13 @@ export default function App() {
       <ViewTabs activeView={activeView} onViewChange={setActiveView} />
       <TitleFilter value={titleQuery} onChange={setTitleQuery} />
 
-      {showQuickAdd && <QuickAddBar onAdd={handleAdd} />}
+      {showQuickAdd && <QuickAddBar today={today} onAdd={handleAdd} />}
       <TaskList
         tasks={tasks}
+        today={today}
         emptyMessage={VIEW_EMPTY_STATES[activeView]}
         onToggleComplete={handleToggleComplete}
+        onDueDateChange={handleDueDateChange}
       />
     </div>
   );

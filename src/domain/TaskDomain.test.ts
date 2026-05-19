@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTask, toggleComplete } from "./TaskDomain";
+import { createTask, setDueDate, toggleComplete } from "./TaskDomain";
 
 describe("TaskDomain", () => {
   const now = "2026-05-19T10:00:00.000Z";
@@ -30,6 +30,23 @@ describe("TaskDomain", () => {
     expect(completed.completed).toBe(true);
     expect(completed.completedAt).toBe("2026-05-19T11:00:00.000Z");
     expect(completed.updatedAt).toBe("2026-05-19T11:00:00.000Z");
+  });
+
+  it("creates a task with an optional due date", () => {
+    const task = createTask("Việc có hạn", now, "id-2", "2026-05-20");
+
+    expect(task.dueDate).toBe("2026-05-20");
+  });
+
+  it("sets and clears a due date", () => {
+    const task = createTask("Việc A", now, "id-1");
+    const withDue = setDueDate(task, "2026-05-20", "2026-05-19T12:00:00.000Z");
+    const cleared = setDueDate(withDue, null, "2026-05-19T13:00:00.000Z");
+
+    expect(withDue.dueDate).toBe("2026-05-20");
+    expect(withDue.updatedAt).toBe("2026-05-19T12:00:00.000Z");
+    expect(cleared.dueDate).toBeNull();
+    expect(cleared.updatedAt).toBe("2026-05-19T13:00:00.000Z");
   });
 
   it("uncompletes a completed task", () => {

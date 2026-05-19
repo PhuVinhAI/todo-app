@@ -4,6 +4,7 @@ export function createTask(
   title: string,
   now: string = new Date().toISOString(),
   id: string = crypto.randomUUID(),
+  dueDate: string | null = null,
 ): Task {
   const trimmed = title.trim();
   if (!trimmed) {
@@ -13,7 +14,7 @@ export function createTask(
   return {
     id,
     title: trimmed,
-    dueDate: null,
+    dueDate,
     tags: [],
     completed: false,
     completedAt: null,
@@ -39,6 +40,18 @@ export function toggleComplete(
     ...task,
     completed: true,
     completedAt: now,
+    updatedAt: now,
+  };
+}
+
+export function setDueDate(
+  task: Task,
+  dueDate: string | null,
+  now: string = new Date().toISOString(),
+): Task {
+  return {
+    ...task,
+    dueDate,
     updatedAt: now,
   };
 }

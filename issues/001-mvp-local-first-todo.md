@@ -10,7 +10,7 @@ created: 2026-05-19
 
 ## Status
 
-Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19): tab Hôm nay / Tất cả / Quá hạn, lọc tiêu đề, empty state theo view, quick-add trên Hôm nay và Tất cả. Các slice #004–#009 chưa implement.
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19): quick-add gán hạn tùy chọn, chip inline sửa/xóa hạn, `DueDatePresentation`, lưu `YYYY-MM-DD`. Các slice #005–#009 chưa implement.
 
 ## Acceptance criteria (MVP — tiến độ)
 
@@ -25,7 +25,13 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 37 | Theme theo OS | ✅ #002 |
 | 40 | Static deploy, không backend | ✅ #002 |
 | 41 | Không đăng nhập | ✅ #002 |
-| 1 | Mở app thấy Hôm nay + quá hạn | ✅ #003 (lọc; cần #004 để gán hạn khi tạo) |
+| 1 | Mở app thấy Hôm nay + quá hạn | ✅ #003 #004 |
+| 4 | Gán hạn khi tạo (Hôm nay, Ngày mai, chọn ngày) | ✅ #004 |
+| 14 | Sửa/xóa hạn inline qua chip | ✅ #004 |
+| 15 | Chip: Hôm nay, Ngày mai, Xóa hạn, Chọn ngày | ✅ #004 |
+| 29 | Hạn chỉ theo ngày (không giờ) | ✅ #004 |
+| 30 | Hiển thị Hôm nay / Ngày mai / dd/MM/yyyy | ✅ #004 |
+| 44 | Xóa hạn không cần xác nhận | ✅ #004 |
 | 8 | Việc xong ẩn khỏi Hôm nay/Tất cả/Quá hạn | ✅ #003 |
 | 23–24 | View Quá hạn + quy tắc local | ✅ #003 |
 | 25–27 | Hôm nay: loại undated, gồm due hôm nay + quá hạn | ✅ #003 |
@@ -34,11 +40,11 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 46 | Quick-add trên Hôm nay và Tất cả | ✅ #003 |
 | 47 | Focus quick-add sau tạo việc | ✅ #002 |
 | 50 | Load tasks sau refresh | ✅ #002 |
-| 4–7, 9–20, 29–35, 38–39, 42–44, 48–49 | Còn lại | ⏳ #004–#009 |
+| 5–7, 9–13, 16–20, 31–35, 38–39, 42–43, 48–49 | Còn lại | ⏳ #005–#009 |
 
 ## Implementation notes
 
-Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes).
+Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes).
 
 ### Files created (#002)
 
@@ -68,6 +74,30 @@ Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
 | `src/components/TaskList.tsx` | `emptyMessage` theo view |
 | `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
 | `issues/003-da-view-hom-nay-qua-han-loc.md` | Đánh dấu done + implementation notes |
+
+### Files created (#004)
+
+| File | Mô tả |
+|------|--------|
+| `src/domain/DueDatePresentation.ts` | Nhãn Hôm nay / Ngày mai / dd/MM/yyyy |
+| `src/domain/DueDatePresentation.test.ts` | Unit tests DueDatePresentation |
+| `src/components/DueDateControls.tsx` | Chip gán/sửa hạn dùng chung |
+
+### Files modified (#004)
+
+| File | Mô tả |
+|------|--------|
+| `src/filters/dateUtils.ts` | `addDaysToDateString` |
+| `src/domain/TaskDomain.ts` | `dueDate` tùy chọn khi tạo; `setDueDate` |
+| `src/domain/TaskDomain.test.ts` | Test gán/xóa hạn |
+| `src/store/TaskStore.ts` | `addTask` với hạn; `updateTaskDue` |
+| `src/store/TaskStore.test.ts` | Test persist hạn |
+| `src/components/QuickAddBar.tsx` | Chip hạn trên quick-add |
+| `src/components/TaskRow.tsx` | Chip hạn inline + nhãn |
+| `src/components/TaskList.tsx` | Props `today`, `onDueDateChange` |
+| `src/App.tsx` | Handlers tạo/cập nhật hạn |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/004-han-due-date-them-nhanh-chip.md` | Đánh dấu done + implementation notes |
 
 ### Files deleted
 
