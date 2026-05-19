@@ -7,6 +7,7 @@ import {
   removeTagFromTask,
   setDueDate,
   toggleComplete,
+  updateTaskTitle,
 } from "./TaskDomain";
 import type { Task } from "../types";
 
@@ -66,6 +67,23 @@ describe("TaskDomain", () => {
     expect(uncompleted.completed).toBe(false);
     expect(uncompleted.completedAt).toBeNull();
     expect(uncompleted.updatedAt).toBe("2026-05-19T12:00:00.000Z");
+  });
+
+  it("updates task title and trims whitespace", () => {
+    const task = createTask("Việc cũ", now, "id-1");
+    const updated = updateTaskTitle(task, "  Việc mới  ", "2026-05-19T12:00:00.000Z");
+
+    expect(updated.title).toBe("Việc mới");
+    expect(updated.updatedAt).toBe("2026-05-19T12:00:00.000Z");
+    expect(updated.id).toBe("id-1");
+  });
+
+  it("rejects empty title on update", () => {
+    const task = createTask("Việc A", now, "id-1");
+
+    expect(() => updateTaskTitle(task, "   ", now)).toThrow(
+      "Tiêu đề không được để trống",
+    );
   });
 
   describe("tags", () => {

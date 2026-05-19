@@ -78,4 +78,37 @@ describe("TaskStore", () => {
     const again = new TaskStore(storage);
     expect(again.getState().tasks[0].completed).toBe(false);
   });
+
+  it("persists title update through storage", () => {
+    const task = store.addTask("Việc cũ");
+    store.updateTaskTitle(task.id, "Việc mới");
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks[0].title).toBe("Việc mới");
+  });
+
+  it("deletes a task and returns the removed snapshot", () => {
+    const task = store.addTask("Việc xóa");
+    const removed = store.deleteTask(task.id);
+
+    expect(removed?.title).toBe("Việc xóa");
+    expect(store.getState().tasks).toHaveLength(0);
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks).toHaveLength(0);
+  });
+
+  it("restores a deleted task snapshot", () => {
+    const task = store.addTask("Việc khôi phục");
+    const removed = store.deleteTask(task.id);
+
+    expect(removed).not.toBeNull();
+    store.restoreTask(removed!);
+
+    expect(store.getState().tasks).toHaveLength(1);
+    expect(store.getState().tasks[0].title).toBe("Việc khôi phục");
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks[0].title).toBe("Việc khôi phục");
+  });
 });

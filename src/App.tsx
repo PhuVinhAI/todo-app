@@ -3,6 +3,7 @@ import { QuickAddBar } from "./components/QuickAddBar";
 import { TagViewPicker } from "./components/TagViewPicker";
 import { TaskList } from "./components/TaskList";
 import { TitleFilter } from "./components/TitleFilter";
+import { UndoToast } from "./components/UndoToast";
 import { ViewTabs } from "./components/ViewTabs";
 import { toLocalDateString } from "./filters/dateUtils";
 import {
@@ -13,7 +14,8 @@ import {
   filterToday,
 } from "./filters/ViewFilters";
 import { TaskStore } from "./store/TaskStore";
-import type { ViewId } from "./types";
+import type { Task, ViewId } from "./types";
+import { UndoBuffer } from "./undo/UndoBuffer";
 import { VIEW_EMPTY_STATES } from "./viewEmptyStates";
 
 function filterTasksForView(
@@ -45,6 +47,16 @@ export default function App() {
   const store = storeRef.current;
 
   const [, rerender] = useReducer((n: number) => n + 1, 0);
+
+  const undoBufferRef = useRef<UndoBuffer<Task> | null>(null);
+  if (!undoBufferRef.current) {
+    undoBufferRef.current = new UndoBuffer<Task>({
+      timeoutMs: 5000,
+      onExpire: () => rerender(),
+    });
+  }
+  const undoBuffer = undoBufferRef.current;
+
   const [activeView, setActiveView] = useState<ViewId>("today");
   const [titleQuery, setTitleQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -94,6 +106,31 @@ export default function App() {
     rerender();
   };
 
+  const handleTitleChange = (id: string, title: string) => {
+    try {
+      store.updateTaskTitle(id, title);
+      rerender();
+    } catch {
+      // TaskRow rejects empty titles before calling; ignore unexpected errors.
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    const removed = store.deleteTask(id);
+    if (removed) {
+      undoBuffer.push(removed);
+      rerender();
+    }
+  };
+
+  const handleUndo = () => {
+    const task = undoBuffer.undo();
+    if (task) {
+      store.restoreTask(task);
+      rerender();
+    }
+  };
+
   const handleViewChange = (view: ViewId) => {
     setActiveView(view);
     if (view !== "by-tag") {
@@ -133,10 +170,13 @@ export default function App() {
         emptyMessage={emptyMessage}
         tagSuggestions={tagSuggestions}
         onToggleComplete={handleToggleComplete}
+        onTitleChange={handleTitleChange}
         onDueDateChange={handleDueDateChange}
         onAddTag={handleAddTag}
         onRemoveTag={handleRemoveTag}
+        onDelete={handleDelete}
       />
+      <UndoToast visible={undoBuffer.hasPending()} onUndo={handleUndo} />
     </div>
   );
 }

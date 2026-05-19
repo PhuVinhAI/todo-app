@@ -7,9 +7,11 @@ type TaskListProps = {
   emptyMessage: string;
   tagSuggestions: string[];
   onToggleComplete: (id: string) => void;
+  onTitleChange: (id: string, title: string) => void;
   onDueDateChange: (id: string, dueDate: string | null) => void;
   onAddTag: (id: string, rawTag: string) => void;
   onRemoveTag: (id: string, tag: string) => void;
+  onDelete: (id: string) => void;
 };
 
 export function TaskList({
@@ -18,9 +20,11 @@ export function TaskList({
   emptyMessage,
   tagSuggestions,
   onToggleComplete,
+  onTitleChange,
   onDueDateChange,
   onAddTag,
   onRemoveTag,
+  onDelete,
 }: TaskListProps) {
   if (tasks.length === 0) {
     return (
@@ -39,9 +43,11 @@ export function TaskList({
           today={today}
           tagSuggestions={tagSuggestions}
           onToggleComplete={onToggleComplete}
+          onTitleChange={onTitleChange}
           onDueDateChange={onDueDateChange}
           onAddTag={onAddTag}
           onRemoveTag={onRemoveTag}
+          onDelete={onDelete}
         />
       ))}
     </ul>

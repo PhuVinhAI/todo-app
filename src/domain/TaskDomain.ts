@@ -131,3 +131,20 @@ export function setDueDate(
     updatedAt: now,
   };
 }
+
+export function updateTaskTitle(
+  task: Task,
+  title: string,
+  now: string = new Date().toISOString(),
+): Task {
+  const trimmed = title.trim();
+  if (!trimmed) {
+    throw new Error("Tiêu đề không được để trống");
+  }
+
+  return {
+    ...task,
+    title: trimmed,
+    updatedAt: now,
+  };
+}

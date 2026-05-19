@@ -10,7 +10,7 @@ created: 2026-05-19
 
 ## Status
 
-Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Các slice #006–#009 chưa implement.
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Slice **#006 Sửa tiêu đề inline + xóa việc với Undo** hoàn thành (2026-05-19): inline edit tiêu đề, xóa qua hover/overflow menu, toast Hoàn tác 5 giây, `UndoBuffer` in-memory. Các slice #007–#009 chưa implement.
 
 ## Acceptance criteria (MVP — tiến độ)
 
@@ -44,11 +44,15 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 16–20 | Tag inline, nhiều tag, Enter, gợi ý, chuẩn hóa | ✅ #005 |
 | 25 | View Theo tag | ✅ #005 |
 | 42–43 | Chip tag không màu; xóa tag không xác nhận | ✅ #005 |
-| 7, 9–13, 31–35, 38–39, 48–49 | Còn lại | ⏳ #006–#009 |
+| 13 | Sửa tiêu đề inline (click, blur/Enter) | ✅ #006 |
+| 31 | Xóa việc chưa xong | ✅ #006 |
+| 32 | Toast Undo 5 giây sau xóa một việc | ✅ #006 |
+| 48 | Xóa qua hover hoặc overflow menu | ✅ #006 |
+| 7, 9–12, 33–35, 38–39, 49 | Còn lại | ⏳ #007–#009 |
 
 ## Implementation notes
 
-Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes).
+Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes), [#006](./006-sua-tieu-de-xoa-undo.md#implementation-notes).
 
 ### Files created (#002)
 
@@ -129,6 +133,28 @@ Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
 | `src/App.tsx` | Tag view + handlers |
 | `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
 | `issues/005-tag-gan-goi-y-view-theo-tag.md` | Done + implementation notes |
+
+### Files created (#006)
+
+| File | Mô tả |
+|------|--------|
+| `src/undo/UndoBuffer.ts` | Giữ tối đa một lần xóa chờ; timer 5s; `push` / `undo` / `commit` |
+| `src/undo/UndoBuffer.test.ts` | Unit tests timer, undo, thay thế pending, commit |
+| `src/components/UndoToast.tsx` | Toast tiếng Việt "Đã xóa việc" + nút Hoàn tác |
+
+### Files modified (#006)
+
+| File | Mô tả |
+|------|--------|
+| `src/domain/TaskDomain.ts` | `updateTaskTitle` — trim, reject rỗng |
+| `src/domain/TaskDomain.test.ts` | Unit tests cập nhật tiêu đề |
+| `src/store/TaskStore.ts` | `updateTaskTitle`, `deleteTask`, `restoreTask` |
+| `src/store/TaskStore.test.ts` | Test persist title, delete, restore |
+| `src/components/TaskRow.tsx` | Inline edit tiêu đề; xóa hover (desktop) + overflow menu (mobile) |
+| `src/components/TaskList.tsx` | Truyền `onTitleChange`, `onDelete` |
+| `src/App.tsx` | Wire delete + UndoBuffer + UndoToast |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/006-sua-tieu-de-xoa-undo.md` | Done + implementation notes |
 
 ### Files deleted
 

@@ -5,6 +5,7 @@ import {
   removeTagFromTask as applyRemoveTag,
   setDueDate,
   toggleComplete,
+  updateTaskTitle,
 } from "../domain/TaskDomain";
 import type { AppState, Task } from "../types";
 
@@ -118,5 +119,43 @@ export class TaskStore {
         task.id === id ? toggleComplete(task, now) : task,
       ),
     }));
+  }
+
+  updateTaskTitle(
+    id: string,
+    title: string,
+    now: string = new Date().toISOString(),
+  ): void {
+    this.mutate((state) => ({
+      ...state,
+      tasks: state.tasks.map((task) =>
+        task.id === id ? updateTaskTitle(task, title, now) : task,
+      ),
+    }));
+  }
+
+  deleteTask(id: string): Task | null {
+    const task = this.state.tasks.find((t) => t.id === id) ?? null;
+    if (!task) {
+      return null;
+    }
+
+    this.mutate((state) => ({
+      ...state,
+      tasks: state.tasks.filter((t) => t.id !== id),
+    }));
+    return task;
+  }
+
+  restoreTask(task: Task): void {
+    this.mutate((state) => {
+      if (state.tasks.some((t) => t.id === task.id)) {
+        return state;
+      }
+      return {
+        ...state,
+        tasks: [...state.tasks, task],
+      };
+    });
   }
 }

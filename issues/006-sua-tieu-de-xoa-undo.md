@@ -2,7 +2,7 @@
 id: "006"
 title: "Sửa tiêu đề inline + xóa việc với Undo"
 category: enhancement
-state: ready-for-agent
+state: done
 created: 2026-05-19
 ---
 
@@ -16,11 +16,39 @@ Sửa tiêu đề việc bằng cách click vào tiêu đề (inline edit, khôn
 
 ## Acceptance criteria
 
-- [ ] Click tiêu đề → sửa inline; lưu khi blur/Enter; tiêu đề không rỗng
-- [ ] Nút xóa qua hover hoặc overflow menu (khó bấm nhầm trên mobile)
-- [ ] Xóa một việc → toast Undo 5 giây; Undo khôi phục đúng việc
-- [ ] Không dialog xác nhận cho xóa đơn
-- [ ] UndoBuffer không persist sau refresh
+- [x] Click tiêu đề → sửa inline; lưu khi blur/Enter; tiêu đề không rỗng
+- [x] Nút xóa qua hover hoặc overflow menu (khó bấm nhầm trên mobile)
+- [x] Xóa một việc → toast Undo 5 giây; Undo khôi phục đúng việc
+- [x] Không dialog xác nhận cho xóa đơn
+- [x] UndoBuffer không persist sau refresh
+
+## Implementation notes
+
+### Files created
+
+| File | Mô tả |
+|------|--------|
+| `src/undo/UndoBuffer.ts` | Giữ tối đa một lần xóa chờ; timer 5s; `push` / `undo` / `commit` |
+| `src/undo/UndoBuffer.test.ts` | Unit tests timer, undo, thay thế pending, commit |
+| `src/components/UndoToast.tsx` | Toast tiếng Việt "Đã xóa việc" + nút Hoàn tác |
+
+### Files modified
+
+| File | Mô tả |
+|------|--------|
+| `src/domain/TaskDomain.ts` | `updateTaskTitle` — trim, reject rỗng |
+| `src/domain/TaskDomain.test.ts` | Unit tests cập nhật tiêu đề |
+| `src/store/TaskStore.ts` | `updateTaskTitle`, `deleteTask`, `restoreTask` |
+| `src/store/TaskStore.test.ts` | Test persist title, delete, restore |
+| `src/components/TaskRow.tsx` | Inline edit tiêu đề; xóa hover (desktop) + overflow menu (mobile) |
+| `src/components/TaskList.tsx` | Truyền `onTitleChange`, `onDelete` |
+| `src/App.tsx` | Wire delete + UndoBuffer + UndoToast |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/006-sua-tieu-de-xoa-undo.md` | Đánh dấu done + implementation notes |
+
+### Files deleted
+
+Không có.
 
 ## Blocked by
 
