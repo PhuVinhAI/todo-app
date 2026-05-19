@@ -34,11 +34,11 @@ export function SettingsPanel({
       role="dialog"
       aria-modal="true"
       aria-labelledby="settings-panel-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-900"
+        className="w-full max-w-sm rounded-t-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:rounded-lg"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -62,7 +62,7 @@ export function SettingsPanel({
           <button
             type="button"
             onClick={onExport}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800"
+            className="min-h-11 w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800"
           >
             Xuất dữ liệu (JSON)
           </button>
@@ -78,7 +78,7 @@ export function SettingsPanel({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800"
+              className="min-h-11 w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800"
             >
               Nhập dữ liệu (JSON)
             </button>

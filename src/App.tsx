@@ -1,5 +1,6 @@
 import { useReducer, useRef, useState } from "react";
 import { ConfirmDialog } from "./components/ConfirmDialog";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { QuickAddBar } from "./components/QuickAddBar";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { TagViewPicker } from "./components/TagViewPicker";
@@ -18,6 +19,7 @@ import {
 } from "./filters/ViewFilters";
 import { ImportError, parseImportSnapshot, TaskStore } from "./store/TaskStore";
 import type { Task, ViewId } from "./types";
+import { getThemePreference, type ThemeMode } from "./theme/ThemePreference";
 import { UndoBuffer } from "./undo/UndoBuffer";
 import { VIEW_EMPTY_STATES } from "./viewEmptyStates";
 
@@ -72,6 +74,9 @@ export default function App() {
     json: string;
     taskCount: number;
   } | null>(null);
+  const [themePreference, setThemePreference] = useState<ThemeMode>(() =>
+    getThemePreference().getPreference(),
+  );
 
   const today = toLocalDateString(new Date());
   const tagSuggestions = store.getTagSuggestions();
@@ -207,17 +212,25 @@ export default function App() {
   const currentTaskCount = store.getState().tasks.length;
 
   return (
-    <div className="mx-auto min-h-screen max-w-2xl px-4 py-8">
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Việc cần làm</h1>
-        <button
+    <div className="mx-auto min-h-screen max-w-2xl overflow-x-hidden px-3 py-6 sm:px-4 sm:py-8">
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="min-w-0 text-xl font-bold sm:text-2xl">Việc cần làm</h1>
+        <div className="flex shrink-0 items-center gap-2">
+          <ThemeToggle
+            preference={themePreference}
+            onChange={(mode) => {
+              getThemePreference().setPreference(mode);
+              setThemePreference(mode);
+            }}
+          />
+          <button
           type="button"
           onClick={() => {
             setImportError(null);
             setSettingsOpen(true);
           }}
           aria-label="Cài đặt"
-          className="rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+          className="min-h-9 min-w-9 rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -234,6 +247,7 @@ export default function App() {
             <circle cx="12" cy="12" r="3" />
           </svg>
         </button>
+        </div>
       </header>
 
       <ViewTabs activeView={activeView} onViewChange={handleViewChange} />

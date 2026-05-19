@@ -53,7 +53,7 @@ export function QuickAddBar({ today, tagSuggestions, onAdd }: QuickAddBarProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 space-y-2">
+    <form onSubmit={handleSubmit} className="mb-4 space-y-2 overflow-hidden">
       <input
         ref={inputRef}
         type="text"

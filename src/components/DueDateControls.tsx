@@ -10,10 +10,10 @@ type DueDateControlsProps = {
 };
 
 const chipClass =
-  "rounded-full border border-gray-300 px-2.5 py-0.5 text-sm text-gray-700 transition hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800";
+  "min-h-8 rounded-full border border-gray-300 px-2.5 py-1 text-sm text-gray-700 transition hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800";
 
 const chipActiveClass =
-  "rounded-full border border-blue-500 bg-blue-50 px-2.5 py-0.5 text-sm text-blue-700 dark:border-blue-400 dark:bg-blue-950 dark:text-blue-200";
+  "min-h-8 rounded-full border border-blue-500 bg-blue-50 px-2.5 py-1 text-sm text-blue-700 dark:border-blue-400 dark:bg-blue-950 dark:text-blue-200";
 
 export function DueDateControls({
   dueDate,
