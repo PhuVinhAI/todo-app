@@ -2,11 +2,49 @@
 id: "001"
 title: "MVP: Trang quản lý công việc cá nhân (local-first)"
 category: enhancement
-state: ready-for-agent
+state: in-progress
 created: 2026-05-19
 ---
 
 # PRD: MVP Trang quản lý công việc cá nhân (local-first)
+
+## Status
+
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). App chạy được với view Tất cả, quick-add, checkbox, localStorage autosave. Các slice #003–#009 chưa implement.
+
+## Acceptance criteria (MVP — tiến độ)
+
+| # | User story / capability | Trạng thái |
+|---|-------------------------|------------|
+| 2 | Quick-add bằng Enter | ✅ #002 |
+| 3 | Việc mới không hạn, không tag mặc định | ✅ #002 |
+| 6 | Autosave localStorage | ✅ #002 |
+| 7 | Checkbox hoàn thành | ✅ #002 |
+| 21–22 | View Tất cả + sort hạn | ✅ #002 |
+| 36 | UI tiếng Việt | ✅ #002 |
+| 37 | Theme theo OS | ✅ #002 |
+| 40 | Static deploy, không backend | ✅ #002 |
+| 41 | Không đăng nhập | ✅ #002 |
+| 45 | Empty state | ✅ #002 (#002 scope: Tất cả) |
+| 47 | Focus quick-add sau tạo việc | ✅ #002 |
+| 50 | Load tasks sau refresh | ✅ #002 |
+| 1, 8–20, 23–35, 38–39, 42–44, 46, 48–49 | Còn lại | ⏳ #003–#009 |
+
+## Implementation notes
+
+Ghi chú triển khai chi tiết slice đầu tiên: xem [#002 Implementation notes](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes).
+
+### Files created (#002)
+
+Toàn bộ codebase ứng dụng — xem bảng Files created trong issue #002.
+
+### Files modified (#002)
+
+Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
+
+### Files deleted
+
+Không có.
 
 ## Problem Statement
 
