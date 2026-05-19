@@ -27,7 +27,6 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 41 | Không đăng nhập | ✅ #002 |
 | 1 | Mở app thấy Hôm nay + quá hạn | ✅ #003 (lọc; cần #004 để gán hạn khi tạo) |
 | 8 | Việc xong ẩn khỏi Hôm nay/Tất cả/Quá hạn | ✅ #003 |
-| 21–22 | View Tất cả + sort hạn | ✅ #002 |
 | 23–24 | View Quá hạn + quy tắc local | ✅ #003 |
 | 25–27 | Hôm nay: loại undated, gồm due hôm nay + quá hạn | ✅ #003 |
 | 28 | Lọc tiêu đề trong view hiện tại | ✅ #003 |
