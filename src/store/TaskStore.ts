@@ -1,4 +1,11 @@
-import { createTask, setDueDate, toggleComplete } from "../domain/TaskDomain";
+import {
+  addTagToTask as applyAddTag,
+  collectTagSuggestions,
+  createTask,
+  removeTagFromTask as applyRemoveTag,
+  setDueDate,
+  toggleComplete,
+} from "../domain/TaskDomain";
 import type { AppState, Task } from "../types";
 
 const STORAGE_KEY = "todo-app-state";
@@ -48,14 +55,47 @@ export class TaskStore {
   addTask(
     title: string,
     dueDate: string | null = null,
+    tags: string[] = [],
     now: string = new Date().toISOString(),
   ): Task {
-    const task = createTask(title, now, crypto.randomUUID(), dueDate);
+    const knownTags = collectTagSuggestions(this.state.tasks);
+    let task = createTask(title, now, crypto.randomUUID(), dueDate);
+
+    for (const raw of tags) {
+      task = applyAddTag(task, raw, [...knownTags, ...task.tags], now);
+    }
+
     this.mutate((state) => ({
       ...state,
       tasks: [...state.tasks, task],
     }));
     return task;
+  }
+
+  addTag(id: string, rawTag: string, now: string = new Date().toISOString()): void {
+    const knownTags = collectTagSuggestions(this.state.tasks);
+
+    this.mutate((state) => ({
+      ...state,
+      tasks: state.tasks.map((task) =>
+        task.id === id
+          ? applyAddTag(task, rawTag, [...knownTags, ...task.tags], now)
+          : task,
+      ),
+    }));
+  }
+
+  removeTag(id: string, tag: string, now: string = new Date().toISOString()): void {
+    this.mutate((state) => ({
+      ...state,
+      tasks: state.tasks.map((task) =>
+        task.id === id ? applyRemoveTag(task, tag, now) : task,
+      ),
+    }));
+  }
+
+  getTagSuggestions(): string[] {
+    return collectTagSuggestions(this.state.tasks);
   }
 
   updateTaskDue(

@@ -54,6 +54,19 @@ describe("TaskStore", () => {
     expect(reloaded.getState().tasks[0].dueDate).toBeNull();
   });
 
+  it("persists tags on add and inline add/remove", () => {
+    const task = store.addTask("Việc có tag", null, ["Work", "work", "home"]);
+
+    expect(task.tags).toEqual(["Work", "home"]);
+
+    store.addTag(task.id, "WORK");
+    store.removeTag(task.id, "home");
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks[0].tags).toEqual(["Work"]);
+    expect(reloaded.getTagSuggestions()).toEqual(["Work"]);
+  });
+
   it("round-trips toggle complete through storage", () => {
     const task = store.addTask("Việc A");
     store.toggleTaskComplete(task.id);

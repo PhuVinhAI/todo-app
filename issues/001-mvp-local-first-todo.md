@@ -10,7 +10,7 @@ created: 2026-05-19
 
 ## Status
 
-Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19): quick-add gán hạn tùy chọn, chip inline sửa/xóa hạn, `DueDatePresentation`, lưu `YYYY-MM-DD`. Các slice #005–#009 chưa implement.
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Các slice #006–#009 chưa implement.
 
 ## Acceptance criteria (MVP — tiến độ)
 
@@ -40,11 +40,15 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 46 | Quick-add trên Hôm nay và Tất cả | ✅ #003 |
 | 47 | Focus quick-add sau tạo việc | ✅ #002 |
 | 50 | Load tasks sau refresh | ✅ #002 |
-| 5–7, 9–13, 16–20, 31–35, 38–39, 42–43, 48–49 | Còn lại | ⏳ #005–#009 |
+| 5 | Tag tùy chọn khi tạo | ✅ #005 |
+| 16–20 | Tag inline, nhiều tag, Enter, gợi ý, chuẩn hóa | ✅ #005 |
+| 25 | View Theo tag | ✅ #005 |
+| 42–43 | Chip tag không màu; xóa tag không xác nhận | ✅ #005 |
+| 7, 9–13, 31–35, 38–39, 48–49 | Còn lại | ⏳ #006–#009 |
 
 ## Implementation notes
 
-Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes).
+Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes).
 
 ### Files created (#002)
 
@@ -98,6 +102,33 @@ Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
 | `src/App.tsx` | Handlers tạo/cập nhật hạn |
 | `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
 | `issues/004-han-due-date-them-nhanh-chip.md` | Đánh dấu done + implementation notes |
+
+### Files created (#005)
+
+| File | Mô tả |
+|------|--------|
+| `src/components/TagControls.tsx` | Chip tag + nhập tag; gợi ý datalist; Enter thêm |
+| `src/components/TagViewPicker.tsx` | Chọn tag cho view Theo tag |
+
+### Files modified (#005)
+
+| File | Mô tả |
+|------|--------|
+| `src/domain/TaskDomain.ts` | Normalize, add/remove tag, collect suggestions |
+| `src/domain/TaskDomain.test.ts` | Unit tests tag domain |
+| `src/filters/ViewFilters.ts` | `filterByTag` |
+| `src/filters/ViewFilters.test.ts` | Unit tests filterByTag |
+| `src/types.ts` | `ViewId` + `by-tag` |
+| `src/store/TaskStore.ts` | Tag mutations + suggestions |
+| `src/store/TaskStore.test.ts` | Test persist tags |
+| `src/components/QuickAddBar.tsx` | Tag tùy chọn quick-add |
+| `src/components/TaskRow.tsx` | Tag inline |
+| `src/components/TaskList.tsx` | Wire tag props |
+| `src/components/ViewTabs.tsx` | Tab Theo tag |
+| `src/viewEmptyStates.ts` | Empty state by-tag |
+| `src/App.tsx` | Tag view + handlers |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/005-tag-gan-goi-y-view-theo-tag.md` | Done + implementation notes |
 
 ### Files deleted
 

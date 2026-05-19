@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { createTask, setDueDate, toggleComplete } from "./TaskDomain";
+import {
+  addTagToTask,
+  collectTagSuggestions,
+  createTask,
+  normalizeTag,
+  removeTagFromTask,
+  setDueDate,
+  toggleComplete,
+} from "./TaskDomain";
+import type { Task } from "../types";
 
 describe("TaskDomain", () => {
   const now = "2026-05-19T10:00:00.000Z";
@@ -57,5 +66,49 @@ describe("TaskDomain", () => {
     expect(uncompleted.completed).toBe(false);
     expect(uncompleted.completedAt).toBeNull();
     expect(uncompleted.updatedAt).toBe("2026-05-19T12:00:00.000Z");
+  });
+
+  describe("tags", () => {
+    it("normalizes tags with trim and lowercase for comparison", () => {
+      expect(normalizeTag("  Work  ")).toBe("work");
+      expect(normalizeTag("")).toBe("");
+      expect(normalizeTag("   ")).toBe("");
+    });
+
+    it("adds a tag and dedupes case-insensitively on the same task", () => {
+      const task = createTask("Việc A", now, "id-1");
+      const withWork = addTagToTask(task, "Work", [], now);
+      const duplicate = addTagToTask(withWork, "  work ", [], now);
+
+      expect(withWork.tags).toEqual(["Work"]);
+      expect(duplicate.tags).toEqual(["Work"]);
+    });
+
+    it("reuses first-seen casing when adding a tag that already exists elsewhere", () => {
+      const task = createTask("Việc A", now, "id-1");
+      const existing: Task = { ...task, id: "id-2", tags: ["Work"] };
+
+      const withTag = addTagToTask(task, "WORK", collectTagSuggestions([existing]), now);
+
+      expect(withTag.tags).toEqual(["Work"]);
+    });
+
+    it("removes a tag by normalized match without confirmation semantics", () => {
+      const task = createTask("Việc A", now, "id-1");
+      const tagged = addTagToTask(task, "Work", [], now);
+      const cleared = removeTagFromTask(tagged, "work", "2026-05-19T12:00:00.000Z");
+
+      expect(cleared.tags).toEqual([]);
+      expect(cleared.updatedAt).toBe("2026-05-19T12:00:00.000Z");
+    });
+
+    it("collects unique tag suggestions preserving first-seen display casing", () => {
+      const tasks: Task[] = [
+        { ...createTask("A", now, "1"), tags: ["Work", "home"] },
+        { ...createTask("B", now, "2"), tags: ["work", "HOME"] },
+      ];
+
+      expect(collectTagSuggestions(tasks)).toEqual(["Work", "home"]);
+    });
   });
 });

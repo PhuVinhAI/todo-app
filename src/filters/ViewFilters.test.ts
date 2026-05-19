@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "../types";
-import { filterAll, filterByTitle, filterOverdue, filterToday } from "./ViewFilters";
+import {
+  filterAll,
+  filterByTag,
+  filterByTitle,
+  filterOverdue,
+  filterToday,
+} from "./ViewFilters";
 
 function makeTask(overrides: Partial<Task> & Pick<Task, "id" | "title">): Task {
   return {
@@ -117,6 +123,34 @@ describe("ViewFilters", () => {
       ];
 
       expect(filterOverdue(tasks, today)).toHaveLength(1);
+    });
+  });
+
+  describe("filterByTag", () => {
+    it("shows only incomplete tasks with a normalized tag match", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Active work", tags: ["Work"] }),
+        makeTask({ id: "2", title: "Also work", tags: ["work"] }),
+        makeTask({
+          id: "3",
+          title: "Done work",
+          tags: ["Work"],
+          completed: true,
+          completedAt: "2026-05-19T11:00:00.000Z",
+        }),
+        makeTask({ id: "4", title: "Other", tags: ["home"] }),
+      ];
+
+      expect(filterByTag(tasks, "WORK").map((t) => t.title)).toEqual([
+        "Active work",
+        "Also work",
+      ]);
+    });
+
+    it("returns empty list when no tag is selected", () => {
+      const tasks = [makeTask({ id: "1", title: "A", tags: ["Work"] })];
+
+      expect(filterByTag(tasks, "   ")).toEqual([]);
     });
   });
 

@@ -1,3 +1,4 @@
+import { normalizeTag } from "../domain/TaskDomain";
 import type { Task } from "../types";
 
 function sortByDueDateAsc(tasks: Task[]): Task[] {
@@ -31,6 +32,21 @@ export function filterByTitle(tasks: Task[], query: string): Task[] {
 
   const lower = trimmed.toLowerCase();
   return tasks.filter((task) => task.title.toLowerCase().includes(lower));
+}
+
+export function filterByTag(tasks: Task[], selectedTag: string): Task[] {
+  const normalized = normalizeTag(selectedTag);
+  if (normalized === "") {
+    return [];
+  }
+
+  const matching = tasks.filter(
+    (task) =>
+      !task.completed &&
+      task.tags.some((tag) => normalizeTag(tag) === normalized),
+  );
+
+  return filterAll(matching);
 }
 
 export function filterAll(tasks: Task[]): Task[] {

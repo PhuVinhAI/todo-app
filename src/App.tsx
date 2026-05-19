@@ -1,11 +1,13 @@
 import { useReducer, useRef, useState } from "react";
-import { TitleFilter } from "./components/TitleFilter";
 import { QuickAddBar } from "./components/QuickAddBar";
+import { TagViewPicker } from "./components/TagViewPicker";
 import { TaskList } from "./components/TaskList";
+import { TitleFilter } from "./components/TitleFilter";
 import { ViewTabs } from "./components/ViewTabs";
 import { toLocalDateString } from "./filters/dateUtils";
 import {
   filterAll,
+  filterByTag,
   filterByTitle,
   filterOverdue,
   filterToday,
@@ -19,13 +21,18 @@ function filterTasksForView(
   view: ViewId,
   today: string,
   titleQuery: string,
+  selectedTag: string | null,
 ) {
   const byView =
     view === "today"
       ? filterToday(tasks, today)
       : view === "overdue"
         ? filterOverdue(tasks, today)
-        : filterAll(tasks);
+        : view === "by-tag" && selectedTag
+          ? filterByTag(tasks, selectedTag)
+          : view === "by-tag"
+            ? []
+            : filterAll(tasks);
 
   return filterByTitle(byView, titleQuery);
 }
@@ -40,13 +47,30 @@ export default function App() {
   const [, rerender] = useReducer((n: number) => n + 1, 0);
   const [activeView, setActiveView] = useState<ViewId>("today");
   const [titleQuery, setTitleQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const today = toLocalDateString(new Date());
-  const tasks = filterTasksForView(store.getState().tasks, activeView, today, titleQuery);
+  const tagSuggestions = store.getTagSuggestions();
+  const tasks = filterTasksForView(
+    store.getState().tasks,
+    activeView,
+    today,
+    titleQuery,
+    selectedTag,
+  );
   const showQuickAdd = activeView === "today" || activeView === "all";
 
-  const handleAdd = (title: string, dueDate: string | null = null) => {
-    store.addTask(title, dueDate);
+  const emptyMessage =
+    activeView === "by-tag" && !selectedTag
+      ? "Chọn một tag để xem việc."
+      : VIEW_EMPTY_STATES[activeView];
+
+  const handleAdd = (
+    title: string,
+    dueDate: string | null = null,
+    tags: string[] = [],
+  ) => {
+    store.addTask(title, dueDate, tags);
     rerender();
   };
 
@@ -60,22 +84,58 @@ export default function App() {
     rerender();
   };
 
+  const handleAddTag = (id: string, rawTag: string) => {
+    store.addTag(id, rawTag);
+    rerender();
+  };
+
+  const handleRemoveTag = (id: string, tag: string) => {
+    store.removeTag(id, tag);
+    rerender();
+  };
+
+  const handleViewChange = (view: ViewId) => {
+    setActiveView(view);
+    if (view !== "by-tag") {
+      setSelectedTag(null);
+    } else if (!selectedTag && tagSuggestions.length > 0) {
+      setSelectedTag(tagSuggestions[0]);
+    }
+  };
+
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-4 py-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Việc cần làm</h1>
       </header>
 
-      <ViewTabs activeView={activeView} onViewChange={setActiveView} />
+      <ViewTabs activeView={activeView} onViewChange={handleViewChange} />
       <TitleFilter value={titleQuery} onChange={setTitleQuery} />
 
-      {showQuickAdd && <QuickAddBar today={today} onAdd={handleAdd} />}
+      {activeView === "by-tag" && (
+        <TagViewPicker
+          suggestions={tagSuggestions}
+          selectedTag={selectedTag}
+          onSelect={setSelectedTag}
+        />
+      )}
+
+      {showQuickAdd && (
+        <QuickAddBar
+          today={today}
+          tagSuggestions={tagSuggestions}
+          onAdd={handleAdd}
+        />
+      )}
       <TaskList
         tasks={tasks}
         today={today}
-        emptyMessage={VIEW_EMPTY_STATES[activeView]}
+        emptyMessage={emptyMessage}
+        tagSuggestions={tagSuggestions}
         onToggleComplete={handleToggleComplete}
         onDueDateChange={handleDueDateChange}
+        onAddTag={handleAddTag}
+        onRemoveTag={handleRemoveTag}
       />
     </div>
   );
