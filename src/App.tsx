@@ -1,8 +1,34 @@
-import { useReducer, useRef } from "react";
-import { filterAll } from "./filters/ViewFilters";
+import { useReducer, useRef, useState } from "react";
+import { TitleFilter } from "./components/TitleFilter";
 import { QuickAddBar } from "./components/QuickAddBar";
 import { TaskList } from "./components/TaskList";
+import { ViewTabs } from "./components/ViewTabs";
+import { toLocalDateString } from "./filters/dateUtils";
+import {
+  filterAll,
+  filterByTitle,
+  filterOverdue,
+  filterToday,
+} from "./filters/ViewFilters";
 import { TaskStore } from "./store/TaskStore";
+import type { ViewId } from "./types";
+import { VIEW_EMPTY_STATES } from "./viewEmptyStates";
+
+function filterTasksForView(
+  tasks: ReturnType<TaskStore["getState"]>["tasks"],
+  view: ViewId,
+  today: string,
+  titleQuery: string,
+) {
+  const byView =
+    view === "today"
+      ? filterToday(tasks, today)
+      : view === "overdue"
+        ? filterOverdue(tasks, today)
+        : filterAll(tasks);
+
+  return filterByTitle(byView, titleQuery);
+}
 
 export default function App() {
   const storeRef = useRef<TaskStore | null>(null);
@@ -12,8 +38,12 @@ export default function App() {
   const store = storeRef.current;
 
   const [, rerender] = useReducer((n: number) => n + 1, 0);
+  const [activeView, setActiveView] = useState<ViewId>("today");
+  const [titleQuery, setTitleQuery] = useState("");
 
-  const tasks = filterAll(store.getState().tasks);
+  const today = toLocalDateString(new Date());
+  const tasks = filterTasksForView(store.getState().tasks, activeView, today, titleQuery);
+  const showQuickAdd = activeView === "today" || activeView === "all";
 
   const handleAdd = (title: string) => {
     store.addTask(title);
@@ -31,14 +61,15 @@ export default function App() {
         <h1 className="text-2xl font-bold">Việc cần làm</h1>
       </header>
 
-      <nav className="mb-6 border-b border-gray-200 dark:border-gray-800">
-        <span className="inline-block border-b-2 border-blue-600 px-4 py-2 text-sm font-medium text-blue-600">
-          Tất cả
-        </span>
-      </nav>
+      <ViewTabs activeView={activeView} onViewChange={setActiveView} />
+      <TitleFilter value={titleQuery} onChange={setTitleQuery} />
 
-      <QuickAddBar onAdd={handleAdd} />
-      <TaskList tasks={tasks} onToggleComplete={handleToggleComplete} />
+      {showQuickAdd && <QuickAddBar onAdd={handleAdd} />}
+      <TaskList
+        tasks={tasks}
+        emptyMessage={VIEW_EMPTY_STATES[activeView]}
+        onToggleComplete={handleToggleComplete}
+      />
     </div>
   );
 }

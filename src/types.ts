@@ -13,3 +13,5 @@ export type AppState = {
   schemaVersion: 1;
   tasks: Task[];
 };
+
+export type ViewId = "today" | "all" | "overdue";

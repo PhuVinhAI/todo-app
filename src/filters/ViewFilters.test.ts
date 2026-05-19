@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "../types";
-import { filterAll } from "./ViewFilters";
+import { filterAll, filterByTitle, filterOverdue, filterToday } from "./ViewFilters";
 
 function makeTask(overrides: Partial<Task> & Pick<Task, "id" | "title">): Task {
   return {
@@ -42,6 +42,103 @@ describe("ViewFilters", () => {
         "No date",
         "Also no date",
       ]);
+    });
+  });
+
+  describe("filterToday", () => {
+    const today = "2026-05-19";
+
+    it("includes incomplete tasks due today and overdue, excludes undated", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Due today", dueDate: "2026-05-19" }),
+        makeTask({ id: "2", title: "Overdue", dueDate: "2026-05-15" }),
+        makeTask({ id: "3", title: "No date" }),
+        makeTask({ id: "4", title: "Future", dueDate: "2026-05-25" }),
+      ];
+
+      const result = filterToday(tasks, today);
+
+      expect(result.map((t) => t.title)).toEqual(["Overdue", "Due today"]);
+    });
+
+    it("excludes completed tasks", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Active overdue", dueDate: "2026-05-15" }),
+        makeTask({
+          id: "2",
+          title: "Done overdue",
+          dueDate: "2026-05-15",
+          completed: true,
+          completedAt: "2026-05-19T11:00:00.000Z",
+        }),
+      ];
+
+      expect(filterToday(tasks, today)).toHaveLength(1);
+      expect(filterToday(tasks, today)[0].title).toBe("Active overdue");
+    });
+  });
+
+  describe("filterOverdue", () => {
+    const today = "2026-05-19";
+
+    it("includes only incomplete tasks with dueDate before today", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Yesterday", dueDate: "2026-05-18" }),
+        makeTask({ id: "2", title: "Today", dueDate: "2026-05-19" }),
+        makeTask({ id: "3", title: "Tomorrow", dueDate: "2026-05-20" }),
+        makeTask({ id: "4", title: "No date" }),
+      ];
+
+      expect(filterOverdue(tasks, today).map((t) => t.title)).toEqual(["Yesterday"]);
+    });
+
+    it("treats today as not overdue at local calendar day boundary", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Due today", dueDate: today }),
+        makeTask({ id: "2", title: "Due yesterday", dueDate: "2026-05-18" }),
+      ];
+
+      const result = filterOverdue(tasks, today);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe("Due yesterday");
+    });
+
+    it("excludes completed tasks", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Active", dueDate: "2026-05-18" }),
+        makeTask({
+          id: "2",
+          title: "Done",
+          dueDate: "2026-05-18",
+          completed: true,
+          completedAt: "2026-05-19T11:00:00.000Z",
+        }),
+      ];
+
+      expect(filterOverdue(tasks, today)).toHaveLength(1);
+    });
+  });
+
+  describe("filterByTitle", () => {
+    it("filters by case-insensitive substring on title", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Buy Milk" }),
+        makeTask({ id: "2", title: "Call dentist" }),
+        makeTask({ id: "3", title: "MILK powder" }),
+      ];
+
+      expect(filterByTitle(tasks, "milk").map((t) => t.title)).toEqual([
+        "Buy Milk",
+        "MILK powder",
+      ]);
+    });
+
+    it("returns all tasks when query is empty", () => {
+      const tasks = [makeTask({ id: "1", title: "A" }), makeTask({ id: "2", title: "B" })];
+
+      expect(filterByTitle(tasks, "")).toHaveLength(2);
+      expect(filterByTitle(tasks, "   ")).toHaveLength(2);
     });
   });
 });

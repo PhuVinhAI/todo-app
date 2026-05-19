@@ -2,7 +2,7 @@
 id: "003"
 title: "Đa view: Hôm nay, Quá hạn + lọc tiêu đề"
 category: enhancement
-state: ready-for-agent
+state: done
 created: 2026-05-19
 ---
 
@@ -26,13 +26,38 @@ Quick-add bar hiển thị trên view Hôm nay và Tất cả.
 
 ## Acceptance criteria
 
-- [ ] Tab chuyển giữa Hôm nay, Tất cả, Quá hạn; mỗi view lọc đúng quy tắc
-- [ ] Hôm nay gồm việc due hôm nay và quá hạn; loại việc không hạn
-- [ ] Việc đã xong không xuất hiện ở Hôm nay, Tất cả, Quá hạn
-- [ ] Ô lọc tiêu đề hoạt động trên view hiện tại (substring, case-insensitive)
-- [ ] Empty state tiếng Việt cho từng view khi không có việc phù hợp
-- [ ] Quick-add hiển thị trên Hôm nay và Tất cả
-- [ ] Unit test `ViewFilters`: Today bao gồm overdue; Overdue boundary midnight local; title filter
+- [x] Tab chuyển giữa Hôm nay, Tất cả, Quá hạn; mỗi view lọc đúng quy tắc
+- [x] Hôm nay gồm việc due hôm nay và quá hạn; loại việc không hạn
+- [x] Việc đã xong không xuất hiện ở Hôm nay, Tất cả, Quá hạn
+- [x] Ô lọc tiêu đề hoạt động trên view hiện tại (substring, case-insensitive)
+- [x] Empty state tiếng Việt cho từng view khi không có việc phù hợp
+- [x] Quick-add hiển thị trên Hôm nay và Tất cả
+- [x] Unit test `ViewFilters`: Today bao gồm overdue; Overdue boundary midnight local; title filter
+
+## Implementation notes
+
+### Files created
+
+| File | Mô tả |
+|------|--------|
+| `src/components/ViewTabs.tsx` | Tab bar Hôm nay / Tất cả / Quá hạn |
+| `src/components/TitleFilter.tsx` | Ô lọc tiêu đề (substring, không phân biệt hoa thường) |
+| `src/filters/dateUtils.ts` | `toLocalDateString` — ngày local `YYYY-MM-DD` cho so sánh hạn |
+| `src/viewEmptyStates.ts` | Thông báo empty state tiếng Việt theo từng view |
+
+### Files modified
+
+| File | Mô tả |
+|------|--------|
+| `src/filters/ViewFilters.ts` | Thêm `filterToday`, `filterOverdue`, `filterByTitle` |
+| `src/filters/ViewFilters.test.ts` | Unit tests Today/Overdue/title filter |
+| `src/types.ts` | Thêm type `ViewId` |
+| `src/App.tsx` | View state, pipeline lọc, quick-add có điều kiện, mặc định Hôm nay |
+| `src/components/TaskList.tsx` | Nhận `emptyMessage` theo view |
+
+### Files deleted
+
+Không có.
 
 ## Blocked by
 

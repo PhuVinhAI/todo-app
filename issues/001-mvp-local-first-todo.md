@@ -10,7 +10,7 @@ created: 2026-05-19
 
 ## Status
 
-Slice **#002 Bootstrap** hoàn thành (2026-05-19). App chạy được với view Tất cả, quick-add, checkbox, localStorage autosave. Các slice #003–#009 chưa implement.
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19): tab Hôm nay / Tất cả / Quá hạn, lọc tiêu đề, empty state theo view, quick-add trên Hôm nay và Tất cả. Các slice #004–#009 chưa implement.
 
 ## Acceptance criteria (MVP — tiến độ)
 
@@ -25,14 +25,21 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). App chạy được với vi
 | 37 | Theme theo OS | ✅ #002 |
 | 40 | Static deploy, không backend | ✅ #002 |
 | 41 | Không đăng nhập | ✅ #002 |
-| 45 | Empty state | ✅ #002 (#002 scope: Tất cả) |
+| 1 | Mở app thấy Hôm nay + quá hạn | ✅ #003 (lọc; cần #004 để gán hạn khi tạo) |
+| 8 | Việc xong ẩn khỏi Hôm nay/Tất cả/Quá hạn | ✅ #003 |
+| 21–22 | View Tất cả + sort hạn | ✅ #002 |
+| 23–24 | View Quá hạn + quy tắc local | ✅ #003 |
+| 25–27 | Hôm nay: loại undated, gồm due hôm nay + quá hạn | ✅ #003 |
+| 28 | Lọc tiêu đề trong view hiện tại | ✅ #003 |
+| 45 | Empty state theo view | ✅ #003 |
+| 46 | Quick-add trên Hôm nay và Tất cả | ✅ #003 |
 | 47 | Focus quick-add sau tạo việc | ✅ #002 |
 | 50 | Load tasks sau refresh | ✅ #002 |
-| 1, 8–20, 23–35, 38–39, 42–44, 46, 48–49 | Còn lại | ⏳ #003–#009 |
+| 4–7, 9–20, 29–35, 38–39, 42–44, 48–49 | Còn lại | ⏳ #004–#009 |
 
 ## Implementation notes
 
-Ghi chú triển khai chi tiết slice đầu tiên: xem [#002 Implementation notes](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes).
+Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes).
 
 ### Files created (#002)
 
@@ -41,6 +48,27 @@ Toàn bộ codebase ứng dụng — xem bảng Files created trong issue #002.
 ### Files modified (#002)
 
 Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
+
+### Files created (#003)
+
+| File | Mô tả |
+|------|--------|
+| `src/components/ViewTabs.tsx` | Tab bar Hôm nay / Tất cả / Quá hạn |
+| `src/components/TitleFilter.tsx` | Ô lọc tiêu đề |
+| `src/filters/dateUtils.ts` | Ngày local `YYYY-MM-DD` |
+| `src/viewEmptyStates.ts` | Empty state tiếng Việt theo view |
+
+### Files modified (#003)
+
+| File | Mô tả |
+|------|--------|
+| `src/filters/ViewFilters.ts` | `filterToday`, `filterOverdue`, `filterByTitle` |
+| `src/filters/ViewFilters.test.ts` | Unit tests view + title filter |
+| `src/types.ts` | `ViewId` |
+| `src/App.tsx` | Điều hướng view, pipeline lọc, quick-add có điều kiện |
+| `src/components/TaskList.tsx` | `emptyMessage` theo view |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/003-da-view-hom-nay-qua-han-loc.md` | Đánh dấu done + implementation notes |
 
 ### Files deleted
 
