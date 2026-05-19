@@ -5,4 +5,5 @@ export const VIEW_EMPTY_STATES: Record<ViewId, string> = {
   all: "Chưa có việc nào. Thêm việc đầu tiên ở trên.",
   overdue: "Không có việc quá hạn.",
   "by-tag": "Không có việc nào với tag đã chọn.",
+  done: "Chưa có việc đã xong.",
 };

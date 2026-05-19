@@ -134,6 +134,21 @@ export class TaskStore {
     }));
   }
 
+  deleteAllCompleted(): number {
+    const completedIds = new Set(
+      this.state.tasks.filter((t) => t.completed).map((t) => t.id),
+    );
+    if (completedIds.size === 0) {
+      return 0;
+    }
+
+    this.mutate((state) => ({
+      ...state,
+      tasks: state.tasks.filter((t) => !completedIds.has(t.id)),
+    }));
+    return completedIds.size;
+  }
+
   deleteTask(id: string): Task | null {
     const task = this.state.tasks.find((t) => t.id === id) ?? null;
     if (!task) {

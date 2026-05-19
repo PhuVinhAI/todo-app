@@ -2,7 +2,7 @@
 id: "007"
 title: "View Đã xong: xóa một / xóa hết"
 category: enhancement
-state: ready-for-agent
+state: done
 created: 2026-05-19
 ---
 
@@ -16,10 +16,37 @@ Tab **Đã xong** liệt kê việc đã hoàn thành, sắp xếp `completedAt`
 
 ## Acceptance criteria
 
-- [ ] Tab Đã xong hiển thị việc `completed`, mới nhất trước
-- [ ] Xóa vĩnh viễn một việc đã xong
-- [ ] Xóa hết việc đã xong → dialog xác nhận → xóa toàn bộ
-- [ ] Empty state tiếng Việt khi chưa có việc đã xong
+- [x] Tab Đã xong hiển thị việc `completed`, mới nhất trước
+- [x] Xóa vĩnh viễn một việc đã xong
+- [x] Xóa hết việc đã xong → dialog xác nhận → xóa toàn bộ
+- [x] Empty state tiếng Việt khi chưa có việc đã xong
+
+## Implementation notes
+
+### Files created
+
+| File | Mô tả |
+|------|--------|
+| `src/components/ConfirmDialog.tsx` | Hộp thoại xác nhận tái dùng (overlay, Hủy / hành động chính) |
+
+### Files modified
+
+| File | Mô tả |
+|------|--------|
+| `src/types.ts` | `ViewId` thêm `"done"` |
+| `src/filters/ViewFilters.ts` | `filterDone` — chỉ `completed`, sort `completedAt` giảm dần |
+| `src/filters/ViewFilters.test.ts` | Unit tests `filterDone` |
+| `src/store/TaskStore.ts` | `deleteAllCompleted()` — xóa mọi việc đã xong, trả số lượng |
+| `src/store/TaskStore.test.ts` | Test persist `deleteAllCompleted` |
+| `src/components/ViewTabs.tsx` | Tab **Đã xong** |
+| `src/viewEmptyStates.ts` | Empty state "Chưa có việc đã xong." |
+| `src/App.tsx` | View done, xóa vĩnh viễn (không Undo), nút xóa hết + `ConfirmDialog` |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/007-view-da-xong-xoa.md` | Done + implementation notes |
+
+### Files deleted
+
+Không có.
 
 ## Blocked by
 

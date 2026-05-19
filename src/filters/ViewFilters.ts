@@ -49,6 +49,16 @@ export function filterByTag(tasks: Task[], selectedTag: string): Task[] {
   return filterAll(matching);
 }
 
+export function filterDone(tasks: Task[]): Task[] {
+  return tasks
+    .filter((task) => task.completed)
+    .sort((a, b) => {
+      const aTime = a.completedAt ?? "";
+      const bTime = b.completedAt ?? "";
+      return bTime.localeCompare(aTime);
+    });
+}
+
 export function filterAll(tasks: Task[]): Task[] {
   const incomplete = tasks.filter((task) => !task.completed);
 

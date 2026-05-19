@@ -5,6 +5,7 @@ const TABS: { id: ViewId; label: string }[] = [
   { id: "all", label: "Tất cả" },
   { id: "overdue", label: "Quá hạn" },
   { id: "by-tag", label: "Theo tag" },
+  { id: "done", label: "Đã xong" },
 ];
 
 type ViewTabsProps = {

@@ -14,4 +14,4 @@ export type AppState = {
   tasks: Task[];
 };
 
-export type ViewId = "today" | "all" | "overdue" | "by-tag";
+export type ViewId = "today" | "all" | "overdue" | "by-tag" | "done";

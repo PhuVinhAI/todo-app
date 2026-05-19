@@ -4,6 +4,7 @@ import {
   filterAll,
   filterByTag,
   filterByTitle,
+  filterDone,
   filterOverdue,
   filterToday,
 } from "./ViewFilters";
@@ -151,6 +152,46 @@ describe("ViewFilters", () => {
       const tasks = [makeTask({ id: "1", title: "A", tags: ["Work"] })];
 
       expect(filterByTag(tasks, "   ")).toEqual([]);
+    });
+  });
+
+  describe("filterDone", () => {
+    it("includes only completed tasks sorted by completedAt newest first", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Active" }),
+        makeTask({
+          id: "2",
+          title: "Older done",
+          completed: true,
+          completedAt: "2026-05-18T10:00:00.000Z",
+        }),
+        makeTask({
+          id: "3",
+          title: "Newer done",
+          completed: true,
+          completedAt: "2026-05-19T12:00:00.000Z",
+        }),
+      ];
+
+      expect(filterDone(tasks).map((t) => t.title)).toEqual([
+        "Newer done",
+        "Older done",
+      ]);
+    });
+
+    it("excludes incomplete tasks", () => {
+      const tasks = [
+        makeTask({ id: "1", title: "Active" }),
+        makeTask({
+          id: "2",
+          title: "Done",
+          completed: true,
+          completedAt: "2026-05-19T11:00:00.000Z",
+        }),
+      ];
+
+      expect(filterDone(tasks)).toHaveLength(1);
+      expect(filterDone(tasks)[0].title).toBe("Done");
     });
   });
 

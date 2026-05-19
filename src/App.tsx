@@ -1,4 +1,5 @@
 import { useReducer, useRef, useState } from "react";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { QuickAddBar } from "./components/QuickAddBar";
 import { TagViewPicker } from "./components/TagViewPicker";
 import { TaskList } from "./components/TaskList";
@@ -10,6 +11,7 @@ import {
   filterAll,
   filterByTag,
   filterByTitle,
+  filterDone,
   filterOverdue,
   filterToday,
 } from "./filters/ViewFilters";
@@ -30,11 +32,13 @@ function filterTasksForView(
       ? filterToday(tasks, today)
       : view === "overdue"
         ? filterOverdue(tasks, today)
-        : view === "by-tag" && selectedTag
-          ? filterByTag(tasks, selectedTag)
-          : view === "by-tag"
-            ? []
-            : filterAll(tasks);
+        : view === "done"
+          ? filterDone(tasks)
+          : view === "by-tag" && selectedTag
+            ? filterByTag(tasks, selectedTag)
+            : view === "by-tag"
+              ? []
+              : filterAll(tasks);
 
   return filterByTitle(byView, titleQuery);
 }
@@ -60,6 +64,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<ViewId>("today");
   const [titleQuery, setTitleQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [confirmClearDone, setConfirmClearDone] = useState(false);
 
   const today = toLocalDateString(new Date());
   const tagSuggestions = store.getTagSuggestions();
@@ -71,6 +76,10 @@ export default function App() {
     selectedTag,
   );
   const showQuickAdd = activeView === "today" || activeView === "all";
+  const completedCount = store
+    .getState()
+    .tasks.filter((task) => task.completed).length;
+  const showClearDone = activeView === "done" && completedCount > 0;
 
   const emptyMessage =
     activeView === "by-tag" && !selectedTag
@@ -117,10 +126,20 @@ export default function App() {
 
   const handleDelete = (id: string) => {
     const removed = store.deleteTask(id);
-    if (removed) {
-      undoBuffer.push(removed);
-      rerender();
+    if (!removed) {
+      return;
     }
+
+    if (activeView !== "done") {
+      undoBuffer.push(removed);
+    }
+    rerender();
+  };
+
+  const handleClearAllDone = () => {
+    store.deleteAllCompleted();
+    setConfirmClearDone(false);
+    rerender();
   };
 
   const handleUndo = () => {
@@ -164,6 +183,19 @@ export default function App() {
           onAdd={handleAdd}
         />
       )}
+
+      {showClearDone && (
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setConfirmClearDone(true)}
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+          >
+            Xóa hết việc đã xong
+          </button>
+        </div>
+      )}
+
       <TaskList
         tasks={tasks}
         today={today}
@@ -177,6 +209,15 @@ export default function App() {
         onDelete={handleDelete}
       />
       <UndoToast visible={undoBuffer.hasPending()} onUndo={handleUndo} />
+
+      <ConfirmDialog
+        open={confirmClearDone}
+        title="Xóa hết việc đã xong?"
+        message={`Bạn sắp xóa vĩnh viễn ${completedCount} việc đã xong. Thao tác này không thể hoàn tác.`}
+        confirmLabel="Xóa hết"
+        onConfirm={handleClearAllDone}
+        onCancel={() => setConfirmClearDone(false)}
+      />
     </div>
   );
 }

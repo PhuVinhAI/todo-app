@@ -10,7 +10,7 @@ created: 2026-05-19
 
 ## Status
 
-Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Slice **#006 Sửa tiêu đề inline + xóa việc với Undo** hoàn thành (2026-05-19): inline edit tiêu đề, xóa qua hover/overflow menu, toast Hoàn tác 5 giây, `UndoBuffer` in-memory. Các slice #007–#009 chưa implement.
+Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọc tiêu đề** hoàn thành (2026-05-19). Slice **#004 Hạn: thêm nhanh + chip inline** hoàn thành (2026-05-19). Slice **#005 Tag: gán, gợi ý, view Theo tag** hoàn thành (2026-05-19): quick-add tag tùy chọn, tag inline, gợi ý dedupe, view Theo tag, `TaskDomain` normalize. Slice **#006 Sửa tiêu đề inline + xóa việc với Undo** hoàn thành (2026-05-19): inline edit tiêu đề, xóa qua hover/overflow menu, toast Hoàn tác 5 giây, `UndoBuffer` in-memory. Slice **#007 View Đã xong: xóa một / xóa hết** hoàn thành (2026-05-19): tab Đã xong, sort `completedAt` mới nhất trước, xóa vĩnh viễn không Undo, xóa hết + dialog xác nhận. Các slice #008–#009 chưa implement.
 
 ## Acceptance criteria (MVP — tiến độ)
 
@@ -48,11 +48,15 @@ Slice **#002 Bootstrap** hoàn thành (2026-05-19). Slice **#003 Đa view + lọ
 | 31 | Xóa việc chưa xong | ✅ #006 |
 | 32 | Toast Undo 5 giây sau xóa một việc | ✅ #006 |
 | 48 | Xóa qua hover hoặc overflow menu | ✅ #006 |
-| 7, 9–12, 33–35, 38–39, 49 | Còn lại | ⏳ #007–#009 |
+| 9 | View Đã xong liệt kê việc hoàn thành | ✅ #007 |
+| 10 | Xóa vĩnh viễn một việc đã xong | ✅ #007 |
+| 11 | Xóa hết việc đã xong | ✅ #007 |
+| 12 | Dialog xác nhận trước khi xóa hết | ✅ #007 |
+| 33–35, 38–39, 49 | Còn lại | ⏳ #008–#009 |
 
 ## Implementation notes
 
-Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes), [#006](./006-sua-tieu-de-xoa-undo.md#implementation-notes).
+Ghi chú triển khai chi tiết: [#002](./002-bootstrap-luu-viec-view-tat-ca.md#implementation-notes), [#003](./003-da-view-hom-nay-qua-han-loc.md#implementation-notes), [#004](./004-han-due-date-them-nhanh-chip.md#implementation-notes), [#005](./005-tag-gan-goi-y-view-theo-tag.md#implementation-notes), [#006](./006-sua-tieu-de-xoa-undo.md#implementation-notes), [#007](./007-view-da-xong-xoa.md#implementation-notes).
 
 ### Files created (#002)
 
@@ -155,6 +159,27 @@ Không có file ứng dụng sẵn có; chỉ cập nhật issue markdown.
 | `src/App.tsx` | Wire delete + UndoBuffer + UndoToast |
 | `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
 | `issues/006-sua-tieu-de-xoa-undo.md` | Done + implementation notes |
+
+### Files created (#007)
+
+| File | Mô tả |
+|------|--------|
+| `src/components/ConfirmDialog.tsx` | Hộp thoại xác nhận tái dùng (overlay, Hủy / hành động chính) |
+
+### Files modified (#007)
+
+| File | Mô tả |
+|------|--------|
+| `src/types.ts` | `ViewId` thêm `"done"` |
+| `src/filters/ViewFilters.ts` | `filterDone` — chỉ `completed`, sort `completedAt` giảm dần |
+| `src/filters/ViewFilters.test.ts` | Unit tests `filterDone` |
+| `src/store/TaskStore.ts` | `deleteAllCompleted()` — xóa mọi việc đã xong, trả số lượng |
+| `src/store/TaskStore.test.ts` | Test persist `deleteAllCompleted` |
+| `src/components/ViewTabs.tsx` | Tab **Đã xong** |
+| `src/viewEmptyStates.ts` | Empty state "Chưa có việc đã xong." |
+| `src/App.tsx` | View done, xóa vĩnh viễn (không Undo), nút xóa hết + `ConfirmDialog` |
+| `issues/001-mvp-local-first-todo.md` | Cập nhật Status và bảng AC |
+| `issues/007-view-da-xong-xoa.md` | Done + implementation notes |
 
 ### Files deleted
 

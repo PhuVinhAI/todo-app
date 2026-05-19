@@ -98,6 +98,22 @@ describe("TaskStore", () => {
     expect(reloaded.getState().tasks).toHaveLength(0);
   });
 
+  it("deletes all completed tasks and returns the count removed", () => {
+    const active = store.addTask("Việc đang làm");
+    const done = store.addTask("Việc xong");
+    store.toggleTaskComplete(done.id);
+
+    const count = store.deleteAllCompleted();
+
+    expect(count).toBe(1);
+    expect(store.getState().tasks).toHaveLength(1);
+    expect(store.getState().tasks[0].id).toBe(active.id);
+
+    const reloaded = new TaskStore(storage);
+    expect(reloaded.getState().tasks).toHaveLength(1);
+    expect(reloaded.getState().tasks[0].title).toBe("Việc đang làm");
+  });
+
   it("restores a deleted task snapshot", () => {
     const task = store.addTask("Việc khôi phục");
     const removed = store.deleteTask(task.id);
