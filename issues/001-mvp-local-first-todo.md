@@ -1,6 +1,12 @@
-# PRD: MVP Trang quản lý công việc cá nhân (local-first)
+---
+id: "001"
+title: "MVP: Trang quản lý công việc cá nhân (local-first)"
+category: enhancement
+state: ready-for-agent
+created: 2026-05-19
+---
 
-> Published from design session. Labels: `enhancement`, `ready-for-agent`.
+# PRD: MVP Trang quản lý công việc cá nhân (local-first)
 
 ## Problem Statement
 
